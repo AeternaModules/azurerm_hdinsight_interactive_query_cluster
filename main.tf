@@ -23,7 +23,7 @@ resource "azurerm_hdinsight_interactive_query_cluster" "hdinsight_interactive_qu
     head_node {
       password = each.value.roles.head_node.password
       dynamic "script_actions" {
-        for_each = each.value.roles.head_node.script_actions != null ? [each.value.roles.head_node.script_actions] : []
+        for_each = each.value.roles.head_node.script_actions != null ? each.value.roles.head_node.script_actions : []
         content {
           name       = script_actions.value.name
           parameters = script_actions.value.parameters
@@ -43,10 +43,13 @@ resource "azurerm_hdinsight_interactive_query_cluster" "hdinsight_interactive_qu
           dynamic "recurrence" {
             for_each = autoscale.value.recurrence != null ? [autoscale.value.recurrence] : []
             content {
-              schedule {
-                days                  = recurrence.value.schedule.days
-                target_instance_count = recurrence.value.schedule.target_instance_count
-                time                  = recurrence.value.schedule.time
+              dynamic "schedule" {
+                for_each = recurrence.value.schedule
+                content {
+                  days                  = schedule.value.days
+                  target_instance_count = schedule.value.target_instance_count
+                  time                  = schedule.value.time
+                }
               }
               timezone = recurrence.value.timezone
             }
@@ -55,7 +58,7 @@ resource "azurerm_hdinsight_interactive_query_cluster" "hdinsight_interactive_qu
       }
       password = each.value.roles.worker_node.password
       dynamic "script_actions" {
-        for_each = each.value.roles.worker_node.script_actions != null ? [each.value.roles.worker_node.script_actions] : []
+        for_each = each.value.roles.worker_node.script_actions != null ? each.value.roles.worker_node.script_actions : []
         content {
           name       = script_actions.value.name
           parameters = script_actions.value.parameters
@@ -72,7 +75,7 @@ resource "azurerm_hdinsight_interactive_query_cluster" "hdinsight_interactive_qu
     zookeeper_node {
       password = each.value.roles.zookeeper_node.password
       dynamic "script_actions" {
-        for_each = each.value.roles.zookeeper_node.script_actions != null ? [each.value.roles.zookeeper_node.script_actions] : []
+        for_each = each.value.roles.zookeeper_node.script_actions != null ? each.value.roles.zookeeper_node.script_actions : []
         content {
           name       = script_actions.value.name
           parameters = script_actions.value.parameters
